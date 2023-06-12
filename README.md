@@ -20,13 +20,13 @@
 How I expect the command to work:
 
 ```sh
-ruset path/to/dir (args)
+ruset path/to/dir (opts)
 ```
 
 If no path provided search the `node_module` folder inside the current directory (this is going to be my goto almost all the time)
 
 ```sh
-ruset (args)
+ruset (opts)
 ```
 
 ---
