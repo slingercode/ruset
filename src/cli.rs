@@ -4,8 +4,7 @@ use clap::Parser;
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     /// Directory to reset
-    #[arg(short, long)]
-    pub dir: String,
+    pub dir: Option<String>,
 
     /// Install npm dependencies as legacy
     #[arg(short, long)]
