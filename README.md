@@ -10,13 +10,18 @@
 
 `./ruset && cargo install --path .`
 
+**Run**
+
+`ruset some/dir -l -y`
+
 ## Use cases
 
 - **Perform a clean install of the `node_modules` folder on a project:** The reason for this
   is that in a **private project** there are some changes on the Design System that we need to test
-  locally and that temporal changes and some new changes sometimes break the folder and Vite is not
+  locally and that changes sometimes break the `node_modules` folder and Vite is not
   loading the dependencies correctly.
-  Is that workflow what we want?... absolutely not. Is optimal? ... nope, but, this kind of commands just makes my life a little bit more easier 🥹
+
+  Is that workflow what we want?... absolutely not. Is optimal? ... nope, but, this command just makes my life a little bit more easier 🥹
 
 - **Install dependencies as `legacy`:** There are some old dependencies in the project that
   we need to handle, this is actually a WIP but there are another priorities and we are taking
@@ -29,7 +34,7 @@
 
 ---
 
-**How I expect the command to work:**
+**How I expect the command to work**
 
 ```sh
 ruset path/to/dir (opts)
