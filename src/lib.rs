@@ -48,15 +48,11 @@ impl Execution {
         );
 
         if let Err(error) = fs::remove_file(yalc_file) {
-            match error.kind() {
-                _ => return Err(error.to_string()),
-            }
+            return Err(error.to_string());
         }
 
         if let Err(error) = fs::remove_dir_all(yalc_folder) {
-            match error.kind() {
-                _ => return Err(error.to_string()),
-            }
+            return Err(error.to_string());
         }
 
         debug!(
@@ -80,9 +76,7 @@ impl Execution {
         info!("Directory {}", &node_modules_folder);
 
         if let Err(error) = fs::remove_dir_all(node_modules_folder) {
-            match error.kind() {
-                _ => return Err(error.to_string()),
-            }
+            return Err(error.to_string());
         }
 
         debug!(
