@@ -1,7 +1,130 @@
 pub mod cli;
 
 use cli::Args;
-use std::{fs, io::ErrorKind, process::Command, time::Instant};
+use log::{debug, info, warn};
+use std::{fs, process::Command, time::Instant};
+
+pub struct Execution {
+    directory: String,
+    legacy: bool,
+    pub yalc: bool,
+}
+
+impl Execution {
+    /// Creates a new `Execution` instance based on the provided command-line arguments (`Args`).
+    ///
+    /// # Arguments
+    ///
+    /// * `args` - The command-line arguments (`Args`) to initialize the `Execution`.
+    ///
+    /// # Returns
+    ///
+    /// A new `Execution` instance.
+    pub fn new(args: &Args) -> Self {
+        info!("Initializing ruset with the params: {:?}\n", &args);
+
+        Self {
+            directory: get_dir(args),
+            yalc: args.yalc,
+            legacy: args.legacy,
+        }
+    }
+
+    /// Removes the Yalc entries in the specified directory.
+    ///
+    /// # Returns
+    ///
+    /// An `Ok` result if the Yalc installation was successfully removed, or an `Err` containing an error message.
+    pub fn remove_yalc_installation(&self) -> Result<(), String> {
+        let time_removing_yalc = Instant::now();
+        let yalc_folder = format!("{}/.yalc", self.directory);
+        let yalc_file = format!("{}/yalc.lock", self.directory);
+
+        warn!("Yalc arg detected");
+        info!("Removing yalc");
+        info!(
+            "Yalc entries: .yalc {} - yalc.lock {}",
+            &yalc_folder, &yalc_file
+        );
+
+        if let Err(error) = fs::remove_file(yalc_file) {
+            match error.kind() {
+                _ => return Err(error.to_string()),
+            }
+        }
+
+        if let Err(error) = fs::remove_dir_all(yalc_folder) {
+            match error.kind() {
+                _ => return Err(error.to_string()),
+            }
+        }
+
+        debug!(
+            "[remove_yalc_installation]: {:2.?}\n",
+            time_removing_yalc.elapsed()
+        );
+
+        Ok(())
+    }
+
+    /// Removes the `node_modules` directory from the specified directory.
+    ///
+    /// # Returns
+    ///
+    /// An `Ok` result if the `node_modules` directory was successfully removed, or an `Err` containing an error message.
+    pub fn remove_node_modules(&self) -> Result<(), String> {
+        let time_removing_node_modules = Instant::now();
+        let node_modules_folder = format!("{}/node_modules", self.directory);
+
+        info!("Removing node_modules");
+        info!("Directory {}", &node_modules_folder);
+
+        if let Err(error) = fs::remove_dir_all(node_modules_folder) {
+            match error.kind() {
+                _ => return Err(error.to_string()),
+            }
+        }
+
+        debug!(
+            "[remove_node_modules]: {:2.?}\n",
+            time_removing_node_modules.elapsed()
+        );
+
+        Ok(())
+    }
+
+    /// Installs `npm` packages in the specified directory.
+    ///
+    /// # Returns
+    ///
+    /// An `Ok` result if the `npm` dependencies were successfully installed, or an `Err` containing an error message.
+    pub fn install_npm_dependencies(&self) -> Result<(), String> {
+        let time_installing_npm_dependencies = Instant::now();
+
+        info!("Installing dependencies");
+
+        let mut npm = Command::new("npm");
+
+        npm.args(["--prefix", &self.directory, "install"]);
+
+        if self.legacy {
+            warn!("Legacy arg detected, installing using --legacy-peer-deps");
+            npm.arg("--legacy-peer-deps");
+        }
+
+        if let Err(error) = npm.status() {
+            return Err(error.to_string());
+        }
+
+        println!();
+        debug!(
+            "[install_npm_dependencies]: {:2.?}\n",
+            time_installing_npm_dependencies.elapsed()
+        );
+
+        Ok(())
+    }
+}
 
 /// Returns the directory path specified in the command-line arguments (`Args`) or a default path if not provided.
 ///
@@ -21,69 +144,4 @@ fn get_dir(args: &Args) -> String {
     };
 
     return directory.to_owned();
-}
-
-/// Removes the `node_modules` directory from the specified directory.
-///
-/// # Arguments
-///
-/// * `args` - The command-line arguments (`Args`) containing the directory to reset.
-///
-/// # Panics
-///
-/// This function panics if an error occurs while removing the directory or if the directory is not found.
-pub fn remove_node_modules(args: &Args) {
-    let time_removing_node_modules = Instant::now();
-    let directory = get_dir(args);
-
-    let node_modules_folder = format!("{}/node_modules", directory);
-
-    println!("Removing node_modules from {} directory...\n", directory);
-
-    if let Err(error) = fs::remove_dir_all(node_modules_folder) {
-        match error.kind() {
-            ErrorKind::NotFound => panic!("The directory was not found {}", directory),
-            _ => panic!("{:?}", error),
-        }
-    }
-
-    println!(
-        "Done!\n[remove_node_modules]: {:.2?}\n",
-        time_removing_node_modules.elapsed()
-    );
-}
-
-/// Installs npm packages in the specified directory.
-///
-/// # Arguments
-///
-/// * `args` - The command-line arguments (`Args`) containing the directory and any installation flags.
-///
-/// # Panics
-///
-/// This function panics if an error occurs while executing the npm command.
-pub fn install_npm_dependencies(args: &Args) {
-    let time_installing_npm_dependencies = Instant::now();
-    let directory = get_dir(args);
-
-    println!("Installing npm packages...");
-
-    let mut npm = Command::new("npm");
-
-    npm.args(["--prefix", &directory, "install"]);
-
-    if args.legacy {
-        println!("Legacy flag detected, installing using --legacy-peer-deps");
-
-        npm.arg("--legacy-peer-deps");
-    }
-
-    if let Err(error) = npm.status() {
-        panic!("Failed to execute npm command: {:?}", error);
-    }
-
-    println!(
-        "\n\nPackages installed!\n[install_npm_dependencies]: {:.2?}",
-        time_installing_npm_dependencies.elapsed()
-    );
 }

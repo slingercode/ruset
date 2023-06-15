@@ -1,6 +1,6 @@
 [package]
 name = "ruset"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.70"
 description = "Custom and personal node_modules workflow"
@@ -11,3 +11,5 @@ repository = "https://github.com/slingercode/ruset"
 
 [dependencies]
 clap = { version = "4.3.3", features = ["derive"] }
+log = "0.4.19"
+simple_logger = "4.2.0"

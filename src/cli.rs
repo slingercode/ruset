@@ -9,6 +9,10 @@ pub struct Args {
     /// Install npm dependencies as legacy
     #[arg(short, long)]
     pub legacy: bool,
+
+    /// Delete local yalc configuration
+    #[arg(short, long)]
+    pub yalc: bool,
 }
 
 /// Parses the command-line arguments and returns an instance of the `Args` struct.
