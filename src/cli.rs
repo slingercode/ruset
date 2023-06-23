@@ -4,7 +4,7 @@ use clap::Parser;
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     /// Directory to reset
-    pub dir: Option<String>,
+    pub directory: Option<String>,
 
     /// Install npm dependencies as legacy
     #[arg(short, long)]
@@ -13,6 +13,10 @@ pub struct Args {
     /// Delete local yalc configuration
     #[arg(short, long)]
     pub yalc: bool,
+
+    /// Perform the only the npm install process
+    #[arg(long)]
+    pub install_only: bool,
 }
 
 /// Parses the command-line arguments and returns an instance of the `Args` struct.

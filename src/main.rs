@@ -11,16 +11,18 @@ fn main() -> ExitCode {
     let args = get_args();
     let exe = Execution::new(&args);
 
-    if exe.yalc {
-        if let Err(error) = exe.remove_yalc_installation() {
+    if !args.install_only {
+        if exe.yalc {
+            if let Err(error) = exe.remove_yalc_installation() {
+                error!("{}", error);
+                return ExitCode::FAILURE;
+            }
+        }
+
+        if let Err(error) = exe.remove_node_modules() {
             error!("{}", error);
             return ExitCode::FAILURE;
         }
-    }
-
-    if let Err(error) = exe.remove_node_modules() {
-        error!("{}", error);
-        return ExitCode::FAILURE;
     }
 
     if let Err(error) = exe.install_npm_dependencies() {

@@ -8,6 +8,7 @@ pub struct Execution {
     directory: String,
     legacy: bool,
     pub yalc: bool,
+    install_only: bool,
 }
 
 impl Execution {
@@ -27,6 +28,7 @@ impl Execution {
             directory: get_dir(args),
             yalc: args.yalc,
             legacy: args.legacy,
+            install_only: args.install_only,
         }
     }
 
@@ -56,7 +58,7 @@ impl Execution {
         }
 
         debug!(
-            "[remove_yalc_installation]: {:2.?}\n",
+            "[remove_yalc_installation]: {:.2?}\n",
             time_removing_yalc.elapsed()
         );
 
@@ -80,7 +82,7 @@ impl Execution {
         }
 
         debug!(
-            "[remove_node_modules]: {:2.?}\n",
+            "[remove_node_modules]: {:.2?}\n",
             time_removing_node_modules.elapsed()
         );
 
@@ -94,6 +96,10 @@ impl Execution {
     /// An `Ok` result if the `npm` dependencies were successfully installed, or an `Err` containing an error message.
     pub fn install_npm_dependencies(&self) -> Result<(), String> {
         let time_installing_npm_dependencies = Instant::now();
+
+        if self.install_only {
+            warn!("Install only execution detected");
+        }
 
         info!("Installing dependencies");
 
@@ -112,7 +118,7 @@ impl Execution {
 
         println!();
         debug!(
-            "[install_npm_dependencies]: {:2.?}\n",
+            "[install_npm_dependencies]: {:.2?}\n",
             time_installing_npm_dependencies.elapsed()
         );
 
@@ -132,7 +138,7 @@ impl Execution {
 fn get_dir(args: &Args) -> String {
     let default_directory = String::from(".");
 
-    let directory = match &args.dir {
+    let directory = match &args.directory {
         Some(dir) => dir,
         None => &default_directory,
     };

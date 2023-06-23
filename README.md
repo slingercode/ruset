@@ -52,5 +52,7 @@ ruset (opts)
 
 ### TODO
 
-- [ ] Improve the `--help` command
+- [x] ~~Improve the `--help` command~~
 - [x] ~~Manage special use cases, this means that the execution of the command should work with the args specified~~
+- [ ] Refactor structs. The Execution and Args are identical, I need to investigate how can I improve that.
+- [ ] Refactor execute logic. I'm not convinced on how the program works (`main.rs`) I need to fix that 😬
